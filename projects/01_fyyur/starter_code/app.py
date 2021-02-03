@@ -72,7 +72,7 @@ class Artist(db.Model):
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate -Done
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration. - Done
+# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration. - COMPLETED
 class Show(db.Model):
   __tablename__ = 'Show'
 
@@ -143,6 +143,7 @@ def venues():
                })
     return render_template('pages/venues.html', areas=data)
 
+#Ready
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
@@ -192,7 +193,7 @@ def create_venue_form():
 #Ready
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
+  # TODO: insert form data as a new Venue record in the db, instead -COMPLETED
     response = {}
     error = False
     try:
@@ -260,6 +261,7 @@ def delete_venue(venue_id):
 
 #  Artists
 #  ----------------------------------------------------------------
+#Ready
 @app.route('/artists')
 def artists():
     # TODO: replace with real data returned from querying the database
@@ -269,7 +271,7 @@ def artists():
         data.append(artist)
     return render_template('pages/artists.html', artists=data)
  
-
+#Ready
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
@@ -315,129 +317,102 @@ def show_artist(artist_id):
 #  ----------------------------------------------------------------
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
-    artist = Artist.query.get(artist_id)
-    form = ArtistForm(obj=artist)
-    print(form.name.data)
-    # TODO: populate form with fields from artist with ID <artist_id>
-    return render_template('forms/edit_artist.html', form=form, artist=artist)
-
+  form = ArtistForm()
+  artist={
+    "id": 4,
+    "name": "Guns N Petals",
+    "genres": ["Rock n Roll"],
+    "city": "San Francisco",
+    "state": "CA",
+    "phone": "326-123-5000",
+    "website": "https://www.gunsnpetalsband.com",
+    "facebook_link": "https://www.facebook.com/GunsNPetals",
+    "seeking_venue": True,
+    "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
+    "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
+  }
+  # TODO: populate form with fields from artist with ID <artist_id>
+  return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
   # TODO: take values from the form submitted, and update existing
   # artist record with ID <artist_id> using the new attributes
-    if request.method == 'POST':
-        error = False
-        form = request.form.to_dict(True)
-        try:
-            artist = Artist.query.get(artist_id)
-            artist.genres = []
-            artist.name = form['name']
-            artist.genres = request.form.getlist('genres')
-            artist.city = form['city']
-            artist.state = form['state']
-            artist.phone = form['phone']
-            artist.facebook_link = form['facebook_link']
-            db.session.commit()
-            flash('Artist ' + request.form['name'] + ' was successfully updated!')
-        except:
-            db.session.rollback()
-            error = True
-            # on unsuccessful db insert, flash an error instead.
-            flash('An error occurred. Artist ' + request.form['name'] + ' could not be updated.')
-            print(sys.exe_info())
-        finally:
-            db.session.close()
-    return redirect(url_for('show_artist', artist_id=artist_id))
+
+  return redirect(url_for('show_artist', artist_id=artist_id))
 
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-    venue = Venue.query.get(venue_id)
-    form = VenueForm(obj=venue)
-    print(form.name.data)
-    # TODO: populate form with values from venue with ID <venue_id>
-    return render_template('forms/edit_venue.html', form=form, venue=venue)
+  form = VenueForm()
+  venue={
+    "id": 1,
+    "name": "The Musical Hop",
+    "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
+    "address": "1015 Folsom Street",
+    "city": "San Francisco",
+    "state": "CA",
+    "phone": "123-123-1234",
+    "website": "https://www.themusicalhop.com",
+    "facebook_link": "https://www.facebook.com/TheMusicalHop",
+    "seeking_talent": True,
+    "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
+    "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
+  }
+  # TODO: populate form with values from venue with ID <venue_id>
+  return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-    # TODO: take values from the form submitted, and update existing
-    # venue record with ID <venue_id> using the new attributes
-    if request.method == 'POST':
-        error = False
-        form = request.form.to_dict(True)
-        try:
-            venue = Venue.query.get(venue_id)
-            venue.genres = []
-            venue.name = form['name']
-            venue.genres = request.form.getlist('genres')
-            venue.city = form['city']
-            venue.state = form['state']
-            venue.phone = form['phone']
-            venue.facebook_link = form['facebook_link']
-            db.session.commit()
-            flash('Venue ' + request.form['name'] + ' was successfully updated!')
-        except:
-            db.session.rollback()
-            error = True
-            # on unsuccessful db insert, flash an error instead.
-            flash('An error occurred. Venue ' + request.form['name'] + ' could not be updated.')
-            print(sys.exe_info())
-        finally:
-            db.session.close()
-    return redirect(url_for('show_venue', venue_id=venue_id))
+  # TODO: take values from the form submitted, and update existing
+  # venue record with ID <venue_id> using the new attributes
+  return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
 #  ----------------------------------------------------------------
 
-
+#Ready
 @app.route('/artists/create', methods=['GET'])
 def create_artist_form():
     form = ArtistForm()
     return render_template('forms/new_artist.html', form=form)
-
+#Ready
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
-   if request.method == 'POST':
-       error = False
-       name = request.form['name']
-       city = request.form['city']
-       state = request.form['state']
-       phone = request.form['phone']
-       website = request.form['website']
-       image_link = request.form['image_link']
-       genres = request.form.getlist('genres')
-       facebook_link = request.form['facebook_link']
-       seeking_description = request.form['seeking_description']
-       artist = Artist(name=name, city=city, state=state, phone=phone, website=website, image_link=image_link, genres=genres, facebook_link=facebook_link, seeking_venue=seeking_venue, seeking_description=seeking_description)       
-       try:
-           print(artist)
-           db.session.add(artist)
-           db.session.commit()
-           # on successful db insert, flash success
-           flash('Artist ' + request.form['name'] +
-                 ' was successfully listed!')
-       except:
-           db.session.rollback()
-           error = True
-           # on unsuccessful db insert, flash an error instead.
-           flash('An error occurred. Artist ' +
-                 request.form['name'] + ' could not be listed.')
-           print(sys.exe_info())
-       finally:
-           db.session.close()
+    response = {}
+    error = False
+    try:
+        name = request.form.get("name")
+        city = request.form.get("city")
+        state = request.form.get("state")
+        phone = request.form.get("phone")
+        genres = request.form.getlist("genres")
+        facebook_link = request.form.get("facebook_link")
+        artist = Artist(
+            name=name,
+            city=city,
+            state=state,
+            phone=phone,
+            genres=genres,
+            facebook_link=facebook_link,
+        )
+        response["name"] = artist.name
+        db.session.add(artist)
+        db.session.commit()
+    except:
+        error = True
+        flash("An error occurred. Artist " + name + " could not be listed.")
+        db.session.rollback()
+    finally:
+        db.session.close()
+        if error == False:
+            flash("Artist " + response["name"] + " was successfully listed!")
 
-    #    if 'seeking_venue' not in request.form:
-    #        seeking_venue = False
-    #    else:
-    #        seeking_venue = request.form['seeking_venue']
-    #        seeking_description = request.form['seeking_description']
-    #        # TODO: modify data to be the data object returned from db insertion       
-   return render_template('pages/home.html')
+    return render_template("pages/home.html")
 
 
 #  Shows
@@ -464,13 +439,14 @@ def shows():
     return render_template('pages/shows.html', shows=data)
 
 
-    
+#Ready    
 @app.route('/shows/create')
 def create_shows():
   # renders form. do not touch.
   form = ShowForm()
   return render_template('forms/new_show.html', form=form)
 
+#Ready
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
   # called to create new shows in the db, upon submitting new show listing form

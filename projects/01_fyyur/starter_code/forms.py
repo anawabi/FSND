@@ -219,11 +219,19 @@ class ArtistForm(Form):
     website = StringField(
         'image_link', validators=[URL()]
     )
-    seeking_venue = StringField(
-        'seeking_venue'
+    seeking_venue = SelectField(
+        'seeking_venue', validators=[DataRequired()],
+        choices=[
+            ('Yes', 'Yes'),
+            ('No', 'No')
+        ]    
     )
     seeking_description = StringField(
         'seeking_description'
     )
 
 # TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM
+# class ShowForm(Form):
+#     artisName = SelectField()
+#     venueName = SelectField()
+#     start_time = DateTimeField()
