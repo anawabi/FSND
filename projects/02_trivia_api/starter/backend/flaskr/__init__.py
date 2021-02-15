@@ -47,9 +47,10 @@ def create_app(test_config=None):
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
+
+  #  Retrieves all categories
   @app.route('/categories')
   def get_categories():
-    """GET all categories"""
     categories = Category.query.all()
     formatted_categories = {category.id: category.type for category in categories}
 
@@ -98,9 +99,9 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
   ''' 
+  # Endpoint to delete a question based on the provided question ID
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question(question_id):
-    """DELETE a question from the database"""
     question = Question.query.filter(Question.id == question_id).first_or_404()
     try:
       question.delete()
@@ -161,10 +162,9 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
-
+  # Endpoint ot Search question based on the search term provided through the POST method
   @app.route('/questions/search', methods=['POST'])
   def search_questions():
-    """Search questions in database with partial string matching"""
     search_term = request.get_json()['searchTerm']
     formatted_search_term = f'%{search_term}%'
 
@@ -191,9 +191,9 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
+  #  Endpoint that retrieves a question within a particular category
   @app.route('/categories/<int:category_id>/questions')
   def get_categorized_questions(category_id):
-    """GET questions of a certain category"""
     category = Category.query.get(category_id)
     
     if category is None:
@@ -225,10 +225,10 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+
+  # Endpoint that retrieves random queze within a category
   @app.route('/quizzes', methods=['POST'])
-  def get_quiz_question():
-    """Retrieve a brand new quiz question within a category"""
-    
+  def get_quiz_question():    
     previous_questions = request.get_json()['previous_questions']
     quiz_category = request.get_json()['quiz_category']
 
@@ -260,33 +260,32 @@ def create_app(test_config=None):
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
+  # Bad request Error Handler
   @app.errorhandler(400)
   def bad_request(error):
-    """Handle a bad request"""
     return jsonify({
       'error': 400,
       'message': 'bad request'
     }), 400
-  
+  # Resource not found error handler
   @app.errorhandler(404)
   def not_found(error):
-    """Handle resource not found"""
     return jsonify({
       'error': 404,
       'message': 'resource not found'
     }), 404
   
+  # Unprocessable Entity response error handler
   @app.errorhandler(422)
   def unprocessable(error):
-    """Handle unprocessable request"""
     return jsonify({
       'error': 422,
       'message': 'unprocessable'
     }), 422
   
+  # Internal server error handler
   @app.errorhandler(500)
   def internal_error(error):
-    """Handle internal server error"""
     return jsonify({
       'error': 500,
       'message': 'internal server error'
