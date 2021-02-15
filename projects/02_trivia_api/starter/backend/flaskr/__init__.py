@@ -151,6 +151,145 @@ def create_app(test_config=None):
       abort(422)
   
  
+  '''
+  @TODO: COMPLETED
+  Create a POST endpoint to get questions based on a search term. 
+  It should return any questions for whom the search term 
+  is a substring of the question. 
+
+  TEST: Search by any phrase. The questions list will update to include 
+  only question that include that string within their question. 
+  Try using the word "title" to start. 
+  '''
+
+  @app.route('/questions/search', methods=['POST'])
+  def search_questions():
+    """Search questions in database with partial string matching"""
+    search_term = request.get_json()['searchTerm']
+    formatted_search_term = f'%{search_term}%'
+
+    try:
+      questions = Question.query.filter(Question.question.ilike(formatted_search_term)).all()
+      formatted_questions = [question.format() for question in questions]
+
+      total_questions = len(formatted_questions)
+    except:
+      abort(500)
+    finally:
+      return jsonify({
+        'success': True,
+        'questions': formatted_questions,
+        'total_questions': total_questions,
+        'current_category': None
+      })
+
+  '''
+  @TODO: COMPLETED
+  Create a GET endpoint to get questions based on category. 
+
+  TEST: In the "List" tab / main screen, clicking on one of the 
+  categories in the left column will cause only questions of that 
+  category to be shown. 
+  '''
+  @app.route('/categories/<int:category_id>/questions')
+  def get_categorized_questions(category_id):
+    """GET questions of a certain category"""
+    category = Category.query.get(category_id)
+    
+    if category is None:
+      abort(404)
+    else:
+      try:
+        questions = Question.query.filter(Question.category == category.id)
+        formatted_questions = [question.format() for question in questions]
+
+        total_questions = len(formatted_questions)
+      except:
+        abort(500)
+      finally:
+        return jsonify({
+          'success': True,
+          'questions': formatted_questions,
+          'total_questions': total_questions,
+          'current_category': {category.id: category.type}
+        })
+
+  '''
+  @TODO: COMPLETED
+  Create a POST endpoint to get questions to play the quiz. 
+  This endpoint should take category and previous question parameters 
+  and return a random questions within the given category, 
+  if provided, and that is not one of the previous questions. 
+
+  TEST: In the "Play" tab, after a user selects "All" or a category,
+  one question at a time is displayed, the user is allowed to answer
+  and shown whether they were correct or not. 
+  '''
+  @app.route('/quizzes', methods=['POST'])
+  def get_quiz_question():
+    """Retrieve a brand new quiz question within a category"""
+    
+    previous_questions = request.get_json()['previous_questions']
+    quiz_category = request.get_json()['quiz_category']
+
+    try:
+
+      if quiz_category['id'] != 0:
+        new_questions = Question.query.filter(Question.category == quiz_category['id']).filter(~Question.id.in_(previous_questions))
+      else:
+        new_questions = Question.query.filter(~Question.id.in_(previous_questions))
+      
+      formatted_questions = [question.format() for question in new_questions]
+
+      if (len(formatted_questions) > 0):
+        random_question = random.choice(formatted_questions)
+        return jsonify({
+          'success': True,
+          'question': random_question
+        })
+      else:
+        return jsonify({
+          'success': True
+        })
+    except:
+      abort(500)
+
+
+  '''
+  @TODO: COMPLETED
+  Create error handlers for all expected errors 
+  including 404 and 422. 
+  '''
+  @app.errorhandler(400)
+  def bad_request(error):
+    """Handle a bad request"""
+    return jsonify({
+      'error': 400,
+      'message': 'bad request'
+    }), 400
   
+  @app.errorhandler(404)
+  def not_found(error):
+    """Handle resource not found"""
+    return jsonify({
+      'error': 404,
+      'message': 'resource not found'
+    }), 404
+  
+  @app.errorhandler(422)
+  def unprocessable(error):
+    """Handle unprocessable request"""
+    return jsonify({
+      'error': 422,
+      'message': 'unprocessable'
+    }), 422
+  
+  @app.errorhandler(500)
+  def internal_error(error):
+    """Handle internal server error"""
+    return jsonify({
+      'error': 500,
+      'message': 'internal server error'
+    }), 500
   
   return app
