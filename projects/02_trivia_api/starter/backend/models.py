@@ -4,10 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 
 database_name = "trivia"
-database_path = "postgres://{}/{}".format('localhost:5432', database_name)
-
+database_path = "postgresql://{}:{}@{}/{}".format('amann', 'zaq1@WSX', 'localhost:5432', database_name)
+# database_path = 'postgresql://amann:zaq1@WSX@localhost:5432/trivia'
 db = SQLAlchemy()
 
+# SQLALCHEMY_DATABASE_URI = 'postgresql://amann:zaq1@WSX@localhost:5432/fyyur'
 '''
 setup_db(app)
     binds a flask application and a SQLAlchemy service
